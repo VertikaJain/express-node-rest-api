@@ -1,3 +1,4 @@
+const Joi = require("joi");
 const express = require("express")
 const app = express()
 
@@ -28,8 +29,12 @@ app.get("/comics/:id", (req, res) => {
 
 // POST Comic
 app.post("/comics", (req, res) => {
-    if (!req.body)
-        res.status(400).send({ error: "Cannot Add Comics" })
+    const schema = Joi.object({
+        name: Joi.string().min(3).required()
+    })
+    const result = schema.validate(req.body);
+    if (result.error)
+        res.status(400).send({ error: result.error.details[0].message })
     else {
         let newComic = { id: comics.length + 1, name: req.body.name }
         comics.push(newComic)
